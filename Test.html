@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Hiểu Lầm Về Bảo Hiểm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+            min-height: 100vh;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .quiz-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .quiz-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4f46e5, #06b6d4);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+        
+        .question-container {
+            margin-bottom: 25px;
+        }
+        
+        .question-number {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+        
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .option {
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            font-size: 0.95rem;
+        }
+        
+        .option:hover {
+            border-color: #4f46e5;
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+        }
+        
+        .option.selected {
+            border-color: #4f46e5;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .option.correct {
+            border-color: #059669;
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .option.incorrect {
+            border-color: #dc2626;
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .option.correct::after {
+            content: " ✅";
+            font-size: 1.2rem;
+        }
+        
+        .option.incorrect::after {
+            content: " ❌";
+            font-size: 1.2rem;
+        }
+        
+        .explanation {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            border-radius: 16px;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: white;
+            display: none;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            animation: slideUp 0.4s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        .next-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+        }
+        
+        .next-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result-container {
+            text-align: center;
+        }
+        
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3);
+        }
+        
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .result-description {
+            font-size: 1rem;
+            color: #6b7280;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .restart-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #059669, #0d9488);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .excellent { color: #059669; }
+        .good { color: #0d9488; }
+        .average { color: #d97706; }
+        .poor { color: #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="https://cafebiz.cafebizcdn.vn/web_images/cafeBiz180.png" alt="Logo">
+        </div>
+        
+        <div class="quiz-card">
+            <div class="quiz-header">
+                <h1 class="quiz-title">🛡️ Quiz: Hiểu Lầm Về Bảo Hiểm Ở Việt Nam 📋</h1>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+            
+            <div id="quizContent" class="fade-in">
+                <div class="question-container">
+                    <div class="question-number" id="questionNumber">Câu 1/10</div>
+                    <div class="question-text" id="questionText"></div>
+                    <div class="options" id="optionsContainer"></div>
+                    <div class="explanation" id="explanationContainer"></div>
+                </div>
+                <button class="next-btn" id="nextBtn" onclick="nextQuestion()" disabled>Tiếp theo ➡️</button>
+            </div>
+            
+            <div id="resultContainer" class="result-container" style="display: none;">
+                <div class="score-circle" id="scoreCircle"></div>
+                <h2 class="result-title" id="resultTitle"></h2>
+                <p class="result-description" id="resultDescription"></p>
+                <button class="restart-btn" onclick="restartQuiz()">🔄 Làm lại</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Bảo hiểm chỉ dành cho những người có thu nhập cao?",
+                options: ["Đúng, vì phí bảo hiểm rất đắt", "Sai, có nhiều gói bảo hiểm phù hợp với mọi thu nhập", "Đúng, người thu nhập thấp không cần bảo hiểm", "Sai, nhưng chỉ nên mua khi giàu"],
+                correct: 1,
+                explanation: "Ngày nay có rất nhiều sản phẩm bảo hiểm với mức phí phù hợp cho mọi đối tượng thu nhập."
+            },
+            {
+                question: "Mua bảo hiểm nhân thọ khi còn trẻ là lãng phí tiền?",
+                options: ["Đúng, người trẻ ít rủi ro", "Sai, mua sớm phí rẻ hơn và bảo vệ tốt hơn", "Đúng, nên chờ đến 40 tuổi", "Sai, nhưng chỉ cần mua ít thôi"],
+                correct: 1,
+                explanation: "Mua bảo hiểm khi trẻ giúp phí rẻ hơn và có thời gian tích lũy lâu dài."
+            },
+            {
+                question: "Có BHYT rồi không cần mua bảo hiểm y tế tư nhân?",
+                options: ["Đúng, BHYT đã đủ", "Sai, bảo hiểm tư nhân bổ sung những gì BHYT chưa có", "Đúng, mua thêm là lãng phí", "Sai, nhưng chỉ cần mua khi bệnh"],
+                correct: 1,
+                explanation: "BHYT có giới hạn, bảo hiểm tư nhân giúp bổ sung chi phí và dịch vụ tốt hơn."
+            },
+            {
+                question: "Bảo hiểm xe chỉ cần mua TNDS bắt buộc là đủ?",
+                options: ["Đúng, luật chỉ yêu cầu TNDS", "Sai, nên mua thêm bảo hiểm vật chất", "Đúng, xe cũ không cần bảo hiểm thêm", "Sai, nhưng tùy vào giá trị xe"],
+                correct: 1,
+                explanation: "TNDS chỉ bồi thường cho bên thứ ba, bảo hiểm vật chất bảo vệ chính xe của bạn."
+            },
+            {
+                question: "Mua bảo hiểm là mất tiền vì có thể không bao giờ dùng đến?",
+                options: ["Đúng, tốt nhất là tự để dành tiền", "Sai, bảo hiểm là để phòng ngừa rủi ro", "Đúng, xác suất rủi ro rất thấp", "Sai, nhưng chỉ mua khi có dấu hiệu bệnh"],
+                correct: 1,
+                explanation: "Bảo hiểm là công cụ chuyển giao rủi ro, giúp bạn yên tâm về tài chính khi có sự cố."
+            },
+            {
+                question: "Bảo hiểm không chi trả khi bạn đã có bệnh từ trước?",
+                options: ["Đúng, tất cả bệnh cũ đều bị loại trừ", "Sai, tùy vào từng loại bệnh và điều khoản", "Đúng, nên giấu bệnh khi mua", "Sai, bảo hiểm phải chi trả mọi trường hợp"],
+                correct: 1,
+                explanation: "Cần khai báo trung thực sức khỏe. Một số bệnh có thể được chấp nhận với điều kiện đặc biệt."
+            },
+            {
+                question: "Phí bảo hiểm càng rẻ càng tốt?",
+                options: ["Đúng, tiết kiệm được tiền", "Sai, cần cân nhắc quyền lợi và uy tín công ty", "Đúng, bảo hiểm nào cũng như nhau", "Sai, nhưng chỉ cần nhìn vào giá"],
+                correct: 1,
+                explanation: "Phí thấp có thể đi kèm quyền lợi hạn chế hoặc công ty kém uy tín. Cần cân nhắc tổng thể."
+            },
+            {
+                question: "Mua bảo hiểm một lần là đủ dùng cả đời?",
+                options: ["Đúng, không cần thay đổi", "Sai, cần xem xét và điều chỉnh theo thời gian", "Đúng, chỉ cần mua khi trẻ", "Sai, nhưng 5 năm xem xét một lần"],
+                correct: 1,
+                explanation: "Nhu cầu bảo hiểm thay đổi theo độ tuổi, thu nhập và hoàn cảnh gia đình."
+            },
+            {
+                question: "Nhân viên bán bảo hiểm luôn có ý định lừa đảo?",
+                options: ["Đúng, họ chỉ quan tâm đến hoa hồng", "Sai, có nhiều nhân viên chuyên nghiệp và tận tâm", "Đúng, không nên tin tưởng họ", "Sai, nhưng nên cảnh giác với tất cả"],
+                correct: 1,
+                explanation: "Có nhiều nhân viên bảo hiểm chuyên nghiệp. Quan trọng là chọn đại lý uy tín và hiểu rõ sản phẩm."
+            },
+            {
+                question: "Không cần đọc kỹ điều khoản bảo hiểm?",
+                options: ["Đúng, tin tưởng nhân viên bán là đủ", "Sai, phải đọc kỹ để hiểu quyền lợi và trách nhiệm", "Đúng, điều khoản quá phức tạp", "Sai, nhưng chỉ cần đọc phần quyền lợi"],
+                correct: 1,
+                explanation: "Điều khoản bảo hiểm quy định rõ quyền lợi và nghĩa vụ. Đọc kỹ giúp tránh hiểu lầm sau này."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let shuffledQuestions = [];
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function initializeQuiz() {
+            shuffledQuestions = questions.map(q => {
+                const correctAnswer = q.options[q.correct];
+                const shuffledOptions = shuffleArray(q.options);
+                const newCorrectIndex = shuffledOptions.indexOf(correctAnswer);
+                
+                return {
+                    ...q,
+                    options: shuffledOptions,
+                    correct: newCorrectIndex
+                };
+            });
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion) / shuffledQuestions.length) * 100;
+            document.getElementById("progressBar").style.width = progress + "%";
+        }
+
+        function displayQuestion() {
+            const question = shuffledQuestions[currentQuestion];
+            document.getElementById("questionNumber").textContent = `📝 Câu ${currentQuestion + 1}/10`;
+            document.getElementById("questionText").textContent = question.question;
+            
+            const optionsContainer = document.getElementById("optionsContainer");
+            const explanationContainer = document.getElementById("explanationContainer");
+            
+            optionsContainer.innerHTML = "";
+            explanationContainer.style.display = "none";
+            explanationContainer.textContent = "";
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement("div");
+                optionElement.className = "option";
+                optionElement.textContent = option;
+                optionElement.onclick = () => selectOption(index, optionElement);
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            document.getElementById("nextBtn").disabled = true;
+            selectedAnswer = null;
+            updateProgress();
+        }
+
+        function selectOption(index, element) {
+            if (selectedAnswer !== null) return;
+            
+            selectedAnswer = index;
+            const question = shuffledQuestions[currentQuestion];
+            const allOptions = document.querySelectorAll(".option");
+            
+            allOptions.forEach((opt, idx) => {
+                opt.classList.add("disabled");
+                opt.onclick = null;
+                
+                if (idx === question.correct) {
+                    opt.classList.add("correct");
+                } else if (idx === index && idx !== question.correct) {
+                    opt.classList.add("incorrect");
+                }
+            });
+            
+            const explanationContainer = document.getElementById("explanationContainer");
+            explanationContainer.textContent = question.explanation;
+            explanationContainer.style.display = "block";
+            
+            document.getElementById("nextBtn").disabled = false;
+        }
+
+        function nextQuestion() {
+            if (selectedAnswer === shuffledQuestions[currentQuestion].correct) {
+                score++;
+            }
+            
+            currentQuestion++;
+            
+            if (currentQuestion < shuffledQuestions.length) {
+                displayQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById("quizContent").style.display = "none";
+            document.getElementById("resultContainer").style.display = "block";
+            
+            const percentage = (score / shuffledQuestions.length) * 100;
+            document.getElementById("scoreCircle").textContent = score + "/10";
+            
+            let resultClass = "";
+            let resultTitle = "";
+            let resultDescription = "";
+            
+            if (score >= 9) {
+                resultClass = "excellent";
+                resultTitle = "🎉 Xuất sắc! 🏆";
+                resultDescription = "Bạn có hiểu biết rất tốt về bảo hiểm. Bạn đã phá vỡ được hầu hết các hiểu lầm phổ biến và có thể đưa ra những quyết định sáng suốt về bảo hiểm.";
+            } else if (score >= 7) {
+                resultClass = "good";
+                resultTitle = "😊 Khá tốt! 👍";
+                resultDescription = "Bạn đã nắm được những kiến thức cơ bản về bảo hiểm. Tuy nhiên, vẫn còn một vài hiểu lầm cần được làm rõ để bạn có thể tận dụng tối đa lợi ích của bảo hiểm.";
+            } else if (score >= 5) {
+                resultClass = "average";
+                resultTitle = "🤔 Trung bình 📚";
+                resultDescription = "Bạn có một số hiểu biết về bảo hiểm nhưng vẫn còn nhiều hiểu lầm. Hãy tìm hiểu thêm để có thể lựa chọn và sử dụng bảo hiểm một cách hiệu quả nhất.";
+            } else {
+                resultClass = "poor";
+                resultTitle = "😔 Cần cải thiện 💪";
+                resultDescription = "Bạn còn nhiều hiểu lầm về bảo hiểm. Hãy dành thời gian học hỏi thêm về lĩnh vực này để bảo vệ tài chính của bản thân và gia đình tốt hơn.";
+            }
+            
+            document.getElementById("resultTitle").textContent = resultTitle;
+            document.getElementById("resultTitle").className = "result-title " + resultClass;
+            document.getElementById("resultDescription").textContent = resultDescription;
+            
+            updateProgress();
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            selectedAnswer = null;
+            initializeQuiz();
+            document.getElementById("quizContent").style.display = "block";
+            document.getElementById("resultContainer").style.display = "none";
+            displayQuestion();
+        }
+
+        initializeQuiz();
+        displayQuestion();
+    </script>
+</body>
+</html>
